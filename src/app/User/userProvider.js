@@ -4,6 +4,5 @@ import * as userDao from "./userDao.js";
 
 export const retrieveAllUsers = async () => {
   const userList = await userDao.selectAllUsers();
-  console.log(userList); // undefined ???
   return userList;
 };
