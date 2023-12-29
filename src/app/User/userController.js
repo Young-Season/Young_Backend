@@ -7,7 +7,7 @@ import secrets from "../../../secrets.json" assert { type: "json" };
 
 export const getAllUsers = async (req, res) => {
   const userList = await userProvider.retrieveAllUsers();
-  return res.send(baseResponse.SUCCESS, userList);
+  return res.send({baseResponse.SUCCESS, userList});
 };
 
 export const redirectOauth = async (req, res) => {
