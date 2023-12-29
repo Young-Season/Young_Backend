@@ -91,13 +91,6 @@ export const postResponse = async (req, res) => {
   }
   const hostName = hostUser.name;
 
-  const guestName = req.body["guestName"];
-  const animal = req.body["animal"];
-  const emoji = req.body["emoji"];
-  const color = req.body["color"];
-  const first = req.body["first"];
-  const now = req.body["now"];
-
   // and add user data to db of host
   const newResponse = await userService.createResponse(req.body);
   if (newResponse)
@@ -107,12 +100,12 @@ export const postResponse = async (req, res) => {
       data: {
         hostId: hostId,
         hostName: hostName,
-        guestName: guestName,
-        animal: animal,
-        emoji: emoji,
-        color: color,
-        first: first,
-        now: now,
+        guestName: req.body["guestName"],
+        animal: req.body["animal"],
+        emoji: req.body["emoji"],
+        color: req.body["color"],
+        first: req.body["first"],
+        now: req.body["now"],
       },
     });
   else return res.send(baseResponse.BAD_REQUEST);
