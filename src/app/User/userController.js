@@ -7,7 +7,8 @@ import secrets from "../../../secrets.json" assert { type: "json" };
 
 export const getAllUsers = async (req, res) => {
   const userList = await userProvider.retrieveAllUsers();
-  return res.send(userList);
+  
+  return res.send(userList["name"]);
 };
 
 export const redirectOauth = async (req, res) => {
@@ -66,7 +67,7 @@ export const oauthCallback = async (req, res) => {
 };
 
 export const userSignUp = async (req, res) => {
-  const userId = req.body["id"];
+  const userId = req.body["kakaoId"];
   const userName = req.body["name"];
 
   const newUser = await userService.createUser(userId, userName);
