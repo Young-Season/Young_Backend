@@ -1,5 +1,7 @@
 import * as userDao from "./userDao.js";
 
+const arrName = ["animal", "emoji", "color", "first", "now"];
+
 export const retrieveAllUsers = async () => {
   const userList = await userDao.selectAllUsers();
   return userList;
@@ -15,7 +17,10 @@ export const retrieveHostResult = async (hostId) => {
   if (data) {
     const hostData = data["hostData"];
     const descData = data["descData"];
-    const guestData = data["guestData"];
+    const guestData = hostData.friends.map((friend) => ({
+      id: friend._id,
+      name: friend.name,
+    }));
 
     const image = `${hostData.animal}${hostData.emoji}${hostData.color}`;
 
@@ -42,14 +47,39 @@ export const retrieveGuestResult = async (hostId, guestId) => {
   if (guestResult.length == 0) return null;
   else {
     const guestData = {
-      guestName: guestResult[0].name,
-      animal: guestResult[0].animal,
-      emoji: guestResult[0].emoji,
-      color: guestResult[0].color,
-      first: guestResult[0].first,
-      now: guestResult[0].now,
+      ...guestResult[0]._doc,
     };
-    console.log(guestData);
+    delete guestData._id;
     return guestData;
+  }
+};
+
+export const retrieveStats = async (hostId) => {
+  const userData = await userDao.selectUser(hostId);
+  const total = userData.animal.reduce((sum, val) => sum + val, 0);
+
+  if (total === 0) {
+    return null;
+  } else {
+    let result = {};
+    arrName.forEach((name, idx) => {
+      const arr = userData[name];
+      const first = Math.max(...arr);
+      const firstIdx = arr.indexOf(first);
+      const firstObj = {
+        [name]: firstIdx,
+        percent: Math.floor((first / total) * 100),
+      };
+
+      arr[firstIdx] = 0;
+      const second = Math.max(...arr);
+      const secondObj = {
+        [name]: arr.indexOf(second),
+        percent: Math.floor((second / total) * 100),
+      };
+      result[name] = [firstObj, secondObj];
+    });
+
+    return result;
   }
 };

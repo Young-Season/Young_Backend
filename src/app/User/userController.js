@@ -196,3 +196,31 @@ export const getGuestResult = async (req, res) => {
     });
   else return res.send(baseResponse.BAD_REQUEST);
 };
+
+export const getStats = async (req, res) => {
+  const hostId = req.params.hostId;
+
+  // 헤더에 있는 토큰으로 비교
+  // try {
+  //   const token = req.header['token'];
+  //   const payload = jwt.verify(token, secrets.JWT_SECRET);
+  //   if(payload.id != hostId)
+  //     throw new Error("Unauthorized");
+  // } catch (err) {
+  //   return res.send(baseResponse.UNAUTHOURIZED);
+  // }
+
+  const statsResult = await userProvider.retrieveStats(hostId);
+  if (statsResult) {
+    return res.send({
+      status: "200",
+      message: "Stats Result",
+      data: statsResult,
+    });
+  } else {
+    return res.send({
+      status: "204",
+      message: "No Result Yet",
+    });
+  }
+};

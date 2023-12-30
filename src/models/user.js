@@ -14,11 +14,11 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    animal: Number,
-    emoji: Number,
-    color: Number,
-    first: Number,
-    now: Number,
+    animal: [Number],
+    emoji: [Number],
+    color: [Number],
+    first: [Number],
+    now: [Number],
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,
