@@ -8,7 +8,7 @@ export const selectAllUsers = async () => {
 };
 
 export const selectUser = async (userId) => {
-  const user = await User.findOne({ id: userId });
+  const user = await User.findOne({ id: userId }).populate("friends");
   return user;
 };
 
@@ -26,23 +26,9 @@ export const createNewUser = async (userId, userName) => {
   return newUser;
 };
 
-export const selectHostResult = async (hostId) => {
-  const data = await User.findOne({ id: hostId }).populate("friends");
-
-  if (data.friends.length === 0) {
-    return null;
-  } else {
-    const descData = await Description.findOne({
-      result: `${data.first}${data.now}`,
-    });
-    return { hostData: data, descData: descData };
-  }
-};
-
-export const selectGuestResult = async (hostId, guestId) => {
-  const userData = await User.findOne({ id: hostId }).populate("friends");
-  const guestData = userData.friends.filter((item) => item._id == guestId);
-  return guestData;
+export const selectDescription = async (resultId) => {
+  const descData = await Description.findOne({ result: resultId });
+  return descData;
 };
 
 export const createNewResponse = async (requestData) => {

@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import * as baseResponse from "../../../config/baseResponseStatus.js";
 import * as userProvider from "./userProvider.js";
 import * as userService from "./userService.js";
-import * as userDao from "./userDao.js";
 import secrets from "../../../secrets.json" assert { type: "json" };
 
 export const getAllUsers = async (req, res) => {
@@ -112,6 +111,7 @@ export const getHostResult = async (req, res) => {
   // }
 
   const resultData = await userProvider.retrieveHostResult(hostId);
+
   if (resultData) {
     return res.send({
       status: "200",

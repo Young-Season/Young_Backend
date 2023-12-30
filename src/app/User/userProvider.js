@@ -13,16 +13,25 @@ export const retrieveUser = async (userId) => {
 };
 
 export const retrieveHostResult = async (hostId) => {
-  const data = await userDao.selectHostResult(hostId);
-  if (data) {
-    const hostData = data["hostData"];
-    const descData = data["descData"];
-    const guestData = hostData.friends.map((friend) => ({
+  const userData = await userDao.selectUser(hostId);
+  if (userData.friends.length === 0) return null;
+  else {
+    const guestData = userData.friends.map((friend) => ({
       id: friend._id,
       name: friend.name,
     }));
 
-    const image = `${hostData.animal}${hostData.emoji}${hostData.color}`;
+    let firsts = {};
+    arrName.forEach((name, idx) => {
+      const arr = userData[name];
+      const first = Math.max(...arr);
+      firsts[name] = arr.indexOf(first);
+    });
+
+    const image = `${firsts["animal"]}${firsts["emoji"]}${firsts["color"]}`;
+    const descData = await userDao.selectDescription(
+      `${firsts["first"]}${firsts["now"]}`
+    );
 
     const resultData = {
       image: image,
@@ -32,8 +41,6 @@ export const retrieveHostResult = async (hostId) => {
       guests: guestData,
     };
     return resultData;
-  } else {
-    return null;
   }
 };
 
@@ -43,7 +50,8 @@ export const retrieveResults = async (hostId) => {
 };
 
 export const retrieveGuestResult = async (hostId, guestId) => {
-  const guestResult = await userDao.selectGuestResult(hostId, guestId);
+  const userData = await userDao.selectUser(hostId);
+  const guestResult = userData.friends.filter((item) => item._id == guestId);
   if (guestResult.length == 0) return null;
   else {
     const guestData = {
