@@ -11,8 +11,25 @@ export const retrieveUser = async (userId) => {
 };
 
 export const retrieveHostResult = async (hostId) => {
-  const resultData = await userDao.selectHostResult(hostId);
-  return resultData;
+  const data = await userDao.selectHostResult(hostId);
+  if (data) {
+    const hostData = data["hostData"];
+    const descData = data["descData"];
+    const guestData = data["guestData"];
+
+    const image = `${hostData.animal}${hostData.emoji}${hostData.color}`;
+
+    const resultData = {
+      image: image,
+      title: descData.title,
+      first: descData.first,
+      now: descData.now,
+      guests: guestData,
+    };
+    return resultData;
+  } else {
+    return null;
+  }
 };
 
 export const retrieveResults = async (hostId) => {
