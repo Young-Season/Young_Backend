@@ -14,3 +14,8 @@ export const retrieveHostResult = async (hostId) => {
   const resultData = await userDao.selectHostResult(hostId);
   return resultData;
 };
+
+export const retrieveResults = async (hostId) => {
+  const results = await userDao.selectResults(hostId);
+  return results;
+};
