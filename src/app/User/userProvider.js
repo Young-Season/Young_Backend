@@ -31,3 +31,8 @@ export const retrieveHostResult = async (hostId) => {
     return null;
   }
 };
+
+export const retrieveResults = async (hostId) => {
+  const results = await userDao.selectResults(hostId);
+  return results;
+};

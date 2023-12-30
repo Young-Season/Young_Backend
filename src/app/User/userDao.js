@@ -7,8 +7,8 @@ export const selectAllUsers = async () => {
   return users;
 };
 
-export const selectUser = async (kakaoId) => {
-  const user = await User.findOne({ id: kakaoId });
+export const selectUser = async (userId) => {
+  const user = await User.findOne({ id: userId });
   return user;
 };
 
@@ -61,6 +61,27 @@ export const createNewResponse = async (requestData) => {
     return updatedUser;
   } catch (error) {
     console.error(error);
+    return null;
+  }
+};
+
+export const selectResults = async (hostId) => {
+  const user = await User.findOne({ id: hostId }).populate('friends');
+  if (user) {
+    const results = {
+      hostId: String(user.id),
+      hostName: user.name,
+      data: user.friends.map(friend => ({
+        guestName: friend.name,
+        animal: friend.animal,
+        emoji: friend.emoji,
+        color: friend.color,
+        first: friend.first,
+        now: friend.now,
+      })),
+    };
+    return results;
+  } else {
     return null;
   }
 };
