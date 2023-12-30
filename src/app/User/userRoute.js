@@ -9,6 +9,7 @@ const userRoute = (app) => {
   app.post("/signup", user.userSignUp);
 
   app.post("/responses", user.postResponse);
+  app.get("/results", user.getResults);
 };
 
 export default userRoute;
