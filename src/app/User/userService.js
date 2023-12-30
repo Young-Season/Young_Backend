@@ -1,8 +1,7 @@
 import * as userDao from "./userDao.js";
-import User from "../../models/user.js";
 
 export const createUser = async (userId, userName) => {
-  const existingUser = await User.findOne({ id: userId });
+  const existingUser = await userDao.selectUser(hostId);
 
   if (existingUser) {
     return existingUser;

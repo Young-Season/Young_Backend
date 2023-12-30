@@ -8,56 +8,57 @@ export const selectAllUsers = async () => {
 };
 
 export const selectUser = async (userId) => {
-  const user = await User.findOne({ id: userId });
+  const user = await User.findOne({ id: userId }).populate("friends");
   return user;
 };
 
 export const createNewUser = async (userId, userName) => {
-  const newUser = await User.create({ id: userId, name: userName });
+  const zeroArray = Array(9).fill(0);
+  const newUser = await User.create({
+    id: userId,
+    name: userName,
+    animal: zeroArray,
+    emoji: zeroArray,
+    color: zeroArray,
+    first: zeroArray,
+    now: zeroArray,
+  });
   return newUser;
 };
 
-export const selectHostResult = async (hostId) => {
-  const data = await User.findOne({ id: hostId });
-  if (data.friends.length === 0) {
-    return null;
-  } else {
-    let guestData = [];
-    const getGuestData = data.friends.forEach(async (friend) => {
-      const friendData = await Friend.findOne({ _id: friend });
-      guestData.push({
-        id: friendData._id,
-        name: friendData.name,
-      });
-    });
-    const descData = await Description.findOne({
-      result: `${data.first}${data.now}`,
-    });
-    return { hostData: data, descData: descData, guestData: guestData };
-  }
+export const selectDescription = async (resultId) => {
+  const descData = await Description.findOne({ result: resultId });
+  return descData;
 };
 
 export const createNewResponse = async (requestData) => {
-  // image 계산해서 image: "..."처럼 friend에 string으로 추가 필요
-
   try {
+    const { hostId, guestName, animal, emoji, color, first, now } = requestData;
+
     const newFriend = await Friend.create({
-      name: requestData["guestName"],
-      animal: requestData["animal"],
-      emoji: requestData["emoji"],
-      color: requestData["color"],
-      first: requestData["first"],
-      now: requestData["now"],
+      name: guestName,
+      animal: animal,
+      emoji: emoji,
+      color: color,
+      first: first,
+      now: now,
     });
 
     const updatedUser = await User.findOneAndUpdate(
-      // User의 friends 배열에 응답id 추가
-      { id: requestData["hostId"] },
-      { $push: { friends: newFriend._id } },
+      { id: hostId },
+      {
+        $push: { friends: newFriend._id },
+        $inc: {
+          [`animal.${animal}`]: 1,
+          [`emoji.${emoji}`]: 1,
+          [`color.${color}`]: 1,
+          [`first.${first}`]: 1,
+          [`now.${now}`]: 1,
+        },
+      },
       { new: true }
     ).exec();
 
-    // 항목별 응답수 계산해서 항목+이미지 대표값 수정하는 코드 추가 필요 populate 활용 예상
     return updatedUser;
   } catch (error) {
     console.error(error);
@@ -66,12 +67,12 @@ export const createNewResponse = async (requestData) => {
 };
 
 export const selectResults = async (hostId) => {
-  const user = await User.findOne({ id: hostId }).populate('friends');
+  const user = await User.findOne({ id: hostId }).populate("friends");
   if (user) {
     const results = {
       hostId: String(user.id),
       hostName: user.name,
-      data: user.friends.map(friend => ({
+      data: user.friends.map((friend) => ({
         guestName: friend.name,
         animal: friend.animal,
         emoji: friend.emoji,
