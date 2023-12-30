@@ -8,24 +8,32 @@ export const selectAllUsers = async () => {
 };
 
 export const selectUser = async (kakaoId) => {
-  const user = await User.findOne({ kakaoId: kakaoId });
+  const user = await User.findOne({ id: kakaoId });
   return user;
 };
 
 export const createNewUser = async (userId, userName) => {
-  const newUser = await User.create({ kakaoId: userId, name: userName });
+  const newUser = await User.create({ id: userId, name: userName });
   return newUser;
 };
 
-export const selectHostData = async (hostId) => {
-  const hostData = await User.findOne({ kakaoId: hostId });
-  if (hostData.friends.length === 0) {
+export const selectHostResult = async (hostId) => {
+  const data = await User.findOne({ id: hostId });
+  if (data.friends.length === 0) {
     return null;
   } else {
-    const guestData = await User.findOne({ kakaoId: hostId }).populate(
-      "friends"
-    );
-    return guestData;
+    let guestData = [];
+    const getGuestData = data.friends.forEach(async (friend) => {
+      const friendData = await Friend.findOne({ _id: friend });
+      guestData.push({
+        id: friendData._id,
+        name: friendData.name,
+      });
+    });
+    const descData = await Description.findOne({
+      result: `${data.first}${data.now}`,
+    });
+    return { hostData: data, descData: descData, guestData: guestData };
   }
 };
 
@@ -44,7 +52,7 @@ export const createNewResponse = async (requestData) => {
 
     const updatedUser = await User.findOneAndUpdate(
       // User의 friends 배열에 응답id 추가
-      { kakaoId: requestData["hostId"] },
+      { id: requestData["hostId"] },
       { $push: { friends: newFriend._id } },
       { new: true }
     ).exec();

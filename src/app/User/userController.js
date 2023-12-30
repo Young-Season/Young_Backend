@@ -50,14 +50,14 @@ export const oauthCallback = async (req, res) => {
       return res.send({
         status: "200",
         message: "Login Success",
-        "host-id": kakaoUserInfo.data.id,
+        id: kakaoUserInfo.data.id,
         "host-name": user.name,
       });
     } else {
       return res.send({
         status: "404",
         message: "Signup Required",
-        "host-id": kakaoUserInfo.data.id,
+        id: kakaoUserInfo.data.id,
       });
     }
   } catch (err) {
@@ -84,10 +84,15 @@ export const userSignUp = async (req, res) => {
 };
 
 export const getHostResult = async (req, res) => {
-  const { hostId } = req.params;
+  const hostId = req.params.hostId;
 
   const resultData = await userProvider.retrieveHostResult(hostId);
   if (resultData) {
+    return res.send({
+      status: "200",
+      message: "User Results",
+      data: resultData,
+    });
   } else {
     return res.send({
       status: "204",

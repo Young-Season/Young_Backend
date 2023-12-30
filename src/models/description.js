@@ -9,10 +9,9 @@ const descriptionSchema = new Schema(
       required: true,
       unique: true,
     },
-    detail: {
-      type: String,
-      required: true,
-    },
+    title: String,
+    first: String,
+    now: String,
   },
   {
     versionKey: false,
