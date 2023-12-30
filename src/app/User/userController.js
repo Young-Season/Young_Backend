@@ -3,6 +3,7 @@ import * as qs from "qs";
 import * as baseResponse from "../../../config/baseResponseStatus.js";
 import * as userProvider from "./userProvider.js";
 import * as userService from "./userService.js";
+import * as userDao from "./userDao.js";
 import secrets from "../../../secrets.json" assert { type: "json" };
 
 export const getAllUsers = async (req, res) => {
@@ -67,11 +68,11 @@ export const oauthCallback = async (req, res) => {
 };
 
 export const userSignUp = async (req, res) => {
-  const userId = req.body["kakaoId"];
+  const userId = req.body["id"];
   const userName = req.body["name"];
 
   const newUser = await userService.createUser(userId, userName);
-  if (newUser)
+  if (newUser === null){
     return res.send({
       status: "201",
       message: "New User Created",
@@ -80,7 +81,8 @@ export const userSignUp = async (req, res) => {
         name: userName,
       },
     });
-  else return res.send(baseResponse.BAD_REQUEST);
+  }
+  else return res.send(baseResponse.DUP_USER);
 };
 
 export const postResponse = async (req, res) => {
@@ -99,7 +101,7 @@ export const postResponse = async (req, res) => {
       status: "201",
       message: "Response Save Success",
       data: {
-        hostId: hostId,
+        hostId: String(hostId),
         hostName: hostName,
         guestName: req.body["guestName"],
         animal: req.body["animal"],
@@ -110,4 +112,19 @@ export const postResponse = async (req, res) => {
       },
     });
   else return res.send(baseResponse.BAD_REQUEST);
+};
+
+export const getResults = async (req, res) => {
+  const hostId = String(req.query.hostId);
+
+  const results = await userDao.selectResults(hostId);
+  if (results)
+    return res.send({
+      status: "200",
+      message: "Result list for given host",
+      hostId: results.hostId,
+      hostName: results.hostName,
+      data: results.data,
+    });
+  else return res.send(baseResponse.USER_NOT_FOUND);
 };
