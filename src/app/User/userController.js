@@ -133,7 +133,7 @@ export const postResponse = async (req, res) => {
 export const getResults = async (req, res) => {
   const hostId = String(req.query.hostId);
 
-  const results = await userDao.selectResults(hostId);
+  const results = await userProvider.retrieveResults(hostId);
   if (results)
     return res.send({
       status: "200",
