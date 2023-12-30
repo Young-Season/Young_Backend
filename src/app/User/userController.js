@@ -8,7 +8,7 @@ import secrets from "../../../secrets.json" assert { type: "json" };
 
 export const getAllUsers = async (req, res) => {
   const userList = await userProvider.retrieveAllUsers();
-  
+
   return res.send(userList["name"]);
 };
 
@@ -51,14 +51,14 @@ export const oauthCallback = async (req, res) => {
       return res.send({
         status: "200",
         message: "Login Success",
-        "host-id": kakaoUserInfo.id,
+        "host-id": kakaoUserInfo.data.id,
         "host-name": user.name,
       });
     } else {
       return res.send({
         status: "404",
         message: "Signup Required",
-        "host-id": kakaoUserInfo.id,
+        "host-id": kakaoUserInfo.data.id,
       });
     }
   } catch (err) {
@@ -83,6 +83,22 @@ export const userSignUp = async (req, res) => {
     });
   }
   else return res.send(baseResponse.DUP_USER);
+};
+
+export const getHostResult = async (req, res) => {
+  const { hostId } = req.params;
+
+  const resultData = await userProvider.retrieveHostResult(hostId);
+  if (resultData) {
+  } else {
+    return res.send({
+      status: "204",
+      message: "No Result Yet",
+      data: {
+        image: "000",
+      },
+    });
+  }
 };
 
 export const postResponse = async (req, res) => {

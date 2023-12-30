@@ -1,5 +1,6 @@
 import User from "../../models/user.js";
 import Friend from "../../models/friend.js";
+import Description from "../../models/description.js";
 
 export const selectAllUsers = async () => {
   const [users] = await User.find();
@@ -14,6 +15,18 @@ export const selectUser = async (userId) => {
 export const createNewUser = async (userId, userName) => {
   const newUser = await User.create({ id: userId, name: userName });
   return newUser;
+};
+
+export const selectHostData = async (hostId) => {
+  const hostData = await User.findOne({ kakaoId: hostId });
+  if (hostData.friends.length === 0) {
+    return null;
+  } else {
+    const guestData = await User.findOne({ kakaoId: hostId }).populate(
+      "friends"
+    );
+    return guestData;
+  }
 };
 
 export const createNewResponse = async (requestData) => {
