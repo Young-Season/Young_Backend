@@ -46,26 +46,33 @@ export const selectGuestResult = async (hostId, guestId) => {
 };
 
 export const createNewResponse = async (requestData) => {
-  // image 계산해서 image: "..."처럼 friend에 string으로 추가 필요
-
   try {
+    const { hostId, guestName, animal, emoji, color, first, now } = requestData;
+
     const newFriend = await Friend.create({
-      name: requestData["guestName"],
-      animal: requestData["animal"],
-      emoji: requestData["emoji"],
-      color: requestData["color"],
-      first: requestData["first"],
-      now: requestData["now"],
+      name: guestName,
+      animal: animal,
+      emoji: emoji,
+      color: color,
+      first: first,
+      now: now,
     });
 
     const updatedUser = await User.findOneAndUpdate(
-      // User의 friends 배열에 응답id 추가
-      { id: requestData["hostId"] },
-      { $push: { friends: newFriend._id } },
+      { id: hostId },
+      {
+        $push: { friends: newFriend._id },
+        $inc: {
+          [`animal.${animal}`]: 1,
+          [`emoji.${emoji}`]: 1,
+          [`color.${color}`]: 1,
+          [`first.${first}`]: 1,
+          [`now.${now}`]: 1,
+        },
+      },
       { new: true }
     ).exec();
 
-    // 항목별 응답수 계산해서 항목+이미지 대표값 수정하는 코드 추가 필요 populate 활용 예상
     return updatedUser;
   } catch (error) {
     console.error(error);
