@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as qs from "qs";
+import jwt from "jsonwebtoken";
 import * as baseResponse from "../../../config/baseResponseStatus.js";
 import * as userProvider from "./userProvider.js";
 import * as userService from "./userService.js";
@@ -21,7 +22,7 @@ export const redirectOauth = async (req, res) => {
 export const oauthCallback = async (req, res) => {
   const code = req.query.code;
   try {
-    const token = await axios({
+    const kakaoToken = await axios({
       // 토큰 발급
       method: "POST",
       url: "https://kauth.kakao.com/oauth/token",
@@ -42,17 +43,30 @@ export const oauthCallback = async (req, res) => {
       method: "GET",
       url: "https://kapi.kakao.com/v2/user/me",
       headers: {
-        Authorization: `Bearer ${token.data.access_token}`,
+        Authorization: `Bearer ${kakaoToken.data.access_token}`,
       },
     });
-    console.log(kakaoUserInfo.data);
+
     const user = await userProvider.retrieveUser(kakaoUserInfo.data.id);
     if (user) {
+      const token = jwt.sign(
+        {
+          type: "JWT",
+          id: kakaoUserInfo.data.id,
+          name: user.name,
+        },
+        secrets.JWT_SECRET,
+        {
+          expiresIn: "30m",
+        }
+      );
+
       return res.send({
         status: "200",
         message: "Login Success",
         id: kakaoUserInfo.data.id,
-        "host-name": user.name,
+        hostName: user.name,
+        token: token,
       });
     } else {
       return res.send({
@@ -72,7 +86,7 @@ export const userSignUp = async (req, res) => {
   const userName = req.body["name"];
 
   const newUser = await userService.createUser(userId, userName);
-  if (newUser === null){
+  if (newUser === null) {
     return res.send({
       status: "201",
       message: "New User Created",
@@ -81,12 +95,21 @@ export const userSignUp = async (req, res) => {
         name: userName,
       },
     });
-  }
-  else return res.send(baseResponse.DUP_USER);
+  } else return res.send(baseResponse.DUP_USER);
 };
 
 export const getHostResult = async (req, res) => {
   const hostId = req.params.hostId;
+
+  // 헤더에 있는 토큰으로 비교
+  // try {
+  //   const token = req.header['token'];
+  //   const payload = jwt.verify(token, secrets.JWT_SECRET);
+  //   if(payload.id != hostId)
+  //     throw new Error("Unauthorized");
+  // } catch (err) {
+  //   return res.send(baseResponse.UNAUTHOURIZED);
+  // }
 
   const resultData = await userProvider.retrieveHostResult(hostId);
   if (resultData) {
@@ -148,4 +171,28 @@ export const getResults = async (req, res) => {
       data: results.data,
     });
   else return res.send(baseResponse.USER_NOT_FOUND);
+};
+
+export const getGuestResult = async (req, res) => {
+  const hostId = req.params.hostId;
+  const guestId = req.params.guestId;
+
+  // 헤더에 있는 토큰으로 비교
+  // try {
+  //   const token = req.header['token'];
+  //   const payload = jwt.verify(token, secrets.JWT_SECRET);
+  //   if(payload.id != hostId)
+  //     throw new Error("Unauthorized");
+  // } catch (err) {
+  //   return res.send(baseResponse.UNAUTHOURIZED);
+  // }
+
+  const resultData = await userProvider.retrieveGuestResult(hostId, guestId);
+  if (resultData)
+    return res.send({
+      status: "200",
+      message: "Guest Result",
+      data: resultData,
+    });
+  else return res.send(baseResponse.BAD_REQUEST);
 };

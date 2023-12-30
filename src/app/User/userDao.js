@@ -18,18 +18,16 @@ export const createNewUser = async (userId, userName) => {
 };
 
 export const selectHostResult = async (hostId) => {
-  const data = await User.findOne({ id: hostId });
+  const data = await User.findOne({ id: hostId }).populate("friends");
+
   if (data.friends.length === 0) {
     return null;
   } else {
-    let guestData = [];
-    const getGuestData = data.friends.forEach(async (friend) => {
-      const friendData = await Friend.findOne({ _id: friend });
-      guestData.push({
-        id: friendData._id,
-        name: friendData.name,
-      });
-    });
+    const guestData = data.friends.map((friend) => ({
+      id: friend._id,
+      name: friend.name,
+    }));
+
     const descData = await Description.findOne({
       result: `${data.first}${data.now}`,
     });
@@ -66,12 +64,12 @@ export const createNewResponse = async (requestData) => {
 };
 
 export const selectResults = async (hostId) => {
-  const user = await User.findOne({ id: hostId }).populate('friends');
+  const user = await User.findOne({ id: hostId }).populate("friends");
   if (user) {
     const results = {
       hostId: String(user.id),
       hostName: user.name,
-      data: user.friends.map(friend => ({
+      data: user.friends.map((friend) => ({
         guestName: friend.name,
         animal: friend.animal,
         emoji: friend.emoji,
@@ -84,4 +82,10 @@ export const selectResults = async (hostId) => {
   } else {
     return null;
   }
+};
+
+export const selectGuestResult = async (hostId, guestId) => {
+  const userData = await User.findOne({ id: hostId }).populate("friends");
+  const guestData = userData.friends.filter((item) => item._id == guestId);
+  return guestData;
 };

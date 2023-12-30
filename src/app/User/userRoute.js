@@ -9,6 +9,7 @@ const userRoute = (app) => {
   app.post("/signup", user.userSignUp);
 
   app.get("/data/:hostId", user.getHostResult);
+  app.get("/data/:hostId/:guestId", user.getGuestResult);
 
   app.post("/responses", user.postResponse);
   app.get("/results", user.getResults);
