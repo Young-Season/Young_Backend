@@ -7,6 +7,8 @@ const userRoute = (app) => {
   app.get("/oauth/kakao/callback", user.oauthCallback);
 
   app.post("/signup", user.userSignUp);
+
+  app.post("/responses", user.postResponse);
 };
 
 export default userRoute;

@@ -82,3 +82,32 @@ export const userSignUp = async (req, res) => {
     });
   else return res.send(baseResponse.BAD_REQUEST);
 };
+
+export const postResponse = async (req, res) => {
+  const hostId = req.body["hostId"];
+
+  const hostUser = await userProvider.retrieveUser(hostId);
+  if (!hostUser) {
+    return res.send(baseResponse.USER_NOT_FOUND);
+  }
+  const hostName = hostUser.name;
+
+  // and add user data to db of host
+  const newResponse = await userService.createResponse(req.body);
+  if (newResponse)
+    return res.send({
+      status: "201",
+      message: "Response Save Success",
+      data: {
+        hostId: hostId,
+        hostName: hostName,
+        guestName: req.body["guestName"],
+        animal: req.body["animal"],
+        emoji: req.body["emoji"],
+        color: req.body["color"],
+        first: req.body["first"],
+        now: req.body["now"],
+      },
+    });
+  else return res.send(baseResponse.BAD_REQUEST);
+};
