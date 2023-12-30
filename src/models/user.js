@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
   {
-    kakaoId: {
+    id: {
       type: String,
       required: true,
       unique: true,
@@ -14,16 +14,15 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    animal: String,
-    emoji: String,
-    color: String,
-    first: String,
-    now: String,
-    image: String,
+    animal: Number,
+    emoji: Number,
+    color: Number,
+    first: Number,
+    now: Number,
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Friend",
+        ref: Friend,
       },
     ],
   },
