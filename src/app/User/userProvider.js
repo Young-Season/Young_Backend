@@ -5,7 +5,12 @@ export const retrieveAllUsers = async () => {
   return userList;
 };
 
-export const retrieveUser = async (kakaoId) => {
-  const user = await userDao.selectUser(kakaoId);
+export const retrieveUser = async (userId) => {
+  const user = await userDao.selectUser(userId);
   return user;
+};
+
+export const retrieveHostResult = async (hostId) => {
+  const resultData = await userDao.selectHostResult(hostId);
+  return resultData;
 };

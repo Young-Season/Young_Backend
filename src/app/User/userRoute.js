@@ -8,6 +8,8 @@ const userRoute = (app) => {
 
   app.post("/signup", user.userSignUp);
 
+  app.get("/data/:host-id", user.getHostResult);
+
   app.post("/responses", user.postResponse);
 };
 
