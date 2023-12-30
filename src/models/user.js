@@ -5,8 +5,8 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
   {
-    kakaoId: {
-      type: Number,
+    id: {
+      type: String,
       required: true,
       unique: true,
     },
@@ -19,7 +19,6 @@ const userSchema = new Schema(
     color: Number,
     first: Number,
     now: Number,
-    image: String,
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,

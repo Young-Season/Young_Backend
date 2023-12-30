@@ -14,7 +14,6 @@ const friendSchema = new Schema(
     color: Number,
     first: Number,
     now: Number,
-    image: String,
   },
   {
     versionKey: false,
