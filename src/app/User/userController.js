@@ -224,3 +224,16 @@ export const getStats = async (req, res) => {
     });
   }
 };
+
+export const getNames = async (req, res) => {
+  const hostId = String(req.query.hostId);
+
+  const results = await userProvider.retrieveResults(hostId);
+  if (results)
+    return res.send({
+      status: "200",
+      message: "Host name for Landing Page",
+      hostName: results.hostName
+    });
+  else return res.send(baseResponse.USER_NOT_FOUND);
+};
