@@ -232,6 +232,31 @@ export const getStats = async (req, res) => {
   }
 };
 
+export const getGuestNamesAndCheckDup = async (req, res) => {
+  const hostId = req.query.hostId;
+  const guestNameProvided = req.query.name;
+  const guestName = guestNameProvided.replace("+", " ");
+  const user = await userProvider.retrieveUser(hostId);
+  if (!user) {
+    return res.send(baseResponse.USER_NOT_FOUND);
+  } else {
+    const guestNames = user.friends.map((friend) => friend.name);
+    if (guestNames.includes(guestName)) {
+      return res.send({
+        status: "409",
+        message: "Nickname Duplicated",
+        name: guestName,
+      });
+    } else {
+      return res.send({
+        status: "200",
+        message: "Nickname Available",
+        name: guestName,
+      });
+    }
+  }
+};
+
 export const getNames = async (req, res) => {
   const hostId = String(req.query.hostId);
 
