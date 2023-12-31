@@ -86,12 +86,25 @@ export const userSignUp = async (req, res) => {
 
   const newUser = await userService.createUser(userId, userName);
   if (newUser === null) {
+    const token = jwt.sign(
+      {
+        type: "JWT",
+        id: userId,
+        name: userName,
+      },
+      secrets.JWT_SECRET,
+      {
+        expiresIn: "30m",
+      }
+    );
+
     return res.send({
       status: "201",
       message: "New User Created",
       data: {
         id: userId,
         name: userName,
+        token: token,
       },
     });
   } else return res.send(baseResponse.DUP_USER);
@@ -100,15 +113,13 @@ export const userSignUp = async (req, res) => {
 export const getHostResult = async (req, res) => {
   const hostId = req.params.hostId;
 
-  // 헤더에 있는 토큰으로 비교
-  // try {
-  //   const token = req.header['token'];
-  //   const payload = jwt.verify(token, secrets.JWT_SECRET);
-  //   if(payload.id != hostId)
-  //     throw new Error("Unauthorized");
-  // } catch (err) {
-  //   return res.send(baseResponse.UNAUTHOURIZED);
-  // }
+  try {
+    const token = req.header("token");
+    const payload = jwt.verify(token, secrets.JWT_SECRET);
+    if (payload.id != hostId) throw new Error("Unauthorized");
+  } catch (err) {
+    return res.send(baseResponse.UNAUTHOURIZED);
+  }
 
   const resultData = await userProvider.retrieveHostResult(hostId);
 
@@ -177,15 +188,13 @@ export const getGuestResult = async (req, res) => {
   const hostId = req.params.hostId;
   const guestId = req.params.guestId;
 
-  // 헤더에 있는 토큰으로 비교
-  // try {
-  //   const token = req.header['token'];
-  //   const payload = jwt.verify(token, secrets.JWT_SECRET);
-  //   if(payload.id != hostId)
-  //     throw new Error("Unauthorized");
-  // } catch (err) {
-  //   return res.send(baseResponse.UNAUTHOURIZED);
-  // }
+  try {
+    const token = req.header("token");
+    const payload = jwt.verify(token, secrets.JWT_SECRET);
+    if (payload.id != hostId) throw new Error("Unauthorized");
+  } catch (err) {
+    return res.send(baseResponse.UNAUTHOURIZED);
+  }
 
   const resultData = await userProvider.retrieveGuestResult(hostId, guestId);
   if (resultData)
@@ -200,15 +209,13 @@ export const getGuestResult = async (req, res) => {
 export const getStats = async (req, res) => {
   const hostId = req.params.hostId;
 
-  // 헤더에 있는 토큰으로 비교
-  // try {
-  //   const token = req.header['token'];
-  //   const payload = jwt.verify(token, secrets.JWT_SECRET);
-  //   if(payload.id != hostId)
-  //     throw new Error("Unauthorized");
-  // } catch (err) {
-  //   return res.send(baseResponse.UNAUTHOURIZED);
-  // }
+  try {
+    const token = req.header("token");
+    const payload = jwt.verify(token, secrets.JWT_SECRET);
+    if (payload.id != hostId) throw new Error("Unauthorized");
+  } catch (err) {
+    return res.send(baseResponse.UNAUTHOURIZED);
+  }
 
   const statsResult = await userProvider.retrieveStats(hostId);
   if (statsResult) {
