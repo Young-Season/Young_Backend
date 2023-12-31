@@ -45,8 +45,25 @@ export const retrieveHostResult = async (hostId) => {
 };
 
 export const retrieveResults = async (hostId) => {
-  const results = await userDao.selectResults(hostId);
-  return results;
+  const userData = await userDao.selectUser(hostId);
+
+  if (userData) {
+    const results = {
+      hostId: String(userData.id),
+      hostName: userData.name,
+      data: userData.friends.map((friend) => ({
+        guestName: friend.name,
+        animal: friend.animal,
+        emoji: friend.emoji,
+        color: friend.color,
+        first: friend.first,
+        now: friend.now,
+      })),
+    };
+    return results;
+  } else {
+    return null;
+  }
 };
 
 export const retrieveGuestResult = async (hostId, guestId) => {

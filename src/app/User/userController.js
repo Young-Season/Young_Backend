@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import * as baseResponse from "../../../config/baseResponseStatus.js";
 import * as userProvider from "./userProvider.js";
 import * as userService from "./userService.js";
+import * as encryptUtil from "../../utils/encryption.js";
 import secrets from "../../../secrets.json" assert { type: "json" };
 
 export const getAllUsers = async (req, res) => {
@@ -46,12 +47,14 @@ export const oauthCallback = async (req, res) => {
       },
     });
 
-    const user = await userProvider.retrieveUser(kakaoUserInfo.data.id);
+    const userId = encryptUtil.encrypt(kakaoUserInfo.data.id);
+
+    const user = await userProvider.retrieveUser(userId);
     if (user) {
       const token = jwt.sign(
         {
           type: "JWT",
-          id: kakaoUserInfo.data.id,
+          id: userId,
           name: user.name,
         },
         secrets.JWT_SECRET,
@@ -63,7 +66,7 @@ export const oauthCallback = async (req, res) => {
       return res.send({
         status: "200",
         message: "Login Success",
-        id: kakaoUserInfo.data.id,
+        id: userId,
         hostName: user.name,
         token: token,
       });
@@ -71,7 +74,7 @@ export const oauthCallback = async (req, res) => {
       return res.send({
         status: "404",
         message: "Signup Required",
-        id: kakaoUserInfo.data.id,
+        id: userId,
       });
     }
   } catch (err) {
@@ -265,7 +268,7 @@ export const getNames = async (req, res) => {
     return res.send({
       status: "200",
       message: "Host name for Landing Page",
-      hostName: results.hostName
+      hostName: results.hostName,
     });
   else return res.send(baseResponse.USER_NOT_FOUND);
 };
