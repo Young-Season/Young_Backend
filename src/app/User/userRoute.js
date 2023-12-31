@@ -14,6 +14,7 @@ const userRoute = (app) => {
 
   app.post("/responses", user.postResponse);
   app.get("/results", user.getResults);
+  app.get("/names", user.getNames);
 };
 
 export default userRoute;
