@@ -3,7 +3,7 @@ import * as user from "./userController.js";
 const userRoute = (app) => {
   app.get("/users", user.getAllUsers); // for test
 
-  app.post("/oauth/kakao", user.redirectOauth);
+  app.get("/oauth/kakao", user.redirectOauth);
   app.get("/oauth/kakao/callback", user.oauthCallback);
 
   app.post("/signup", user.userSignUp);
@@ -14,7 +14,8 @@ const userRoute = (app) => {
 
   app.post("/responses", user.postResponse);
   app.get("/results", user.getResults);
-  app.get("/guest-names", user.getGuestNamesAndCheckDup)
+  app.get("/guest-names", user.getGuestNamesAndCheckDup);
+  app.get("/names", user.getNames);
 };
 
 export default userRoute;
