@@ -13,7 +13,7 @@ const userRoute = (app) => {
   app.get("/stats/:hostId", user.getStats);
 
   app.post("/responses", user.postResponse);
-  app.get("/results", user.getResults);
+  app.get("/results/:hostId", user.getResult);
   app.get("/guest-names", user.getGuestNamesAndCheckDup);
   app.get("/names", user.getNames);
 };
