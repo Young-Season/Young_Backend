@@ -28,7 +28,7 @@ export const retrieveHostResult = async (hostId) => {
       firsts[name] = arr.indexOf(first);
     });
 
-    const image = `${firsts["animal"]}${firsts["emoji"]}${firsts["color"]}`;
+    const image = `${firsts["color"]}${firsts["emoji"]}${firsts["animal"]}`;
     const descData = await userDao.selectDescription(
       `${firsts["first"]}${firsts["now"]}`
     );
