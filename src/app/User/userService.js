@@ -20,7 +20,7 @@ export const createResponse = async (requestData) => {
     const newResponse = await userDao.createNewResponse(requestData);
     return newResponse;
   } catch (err) {
-    logger.error(`App - createUser Service error\n: ${err.message}`);
+    logger.error(`App - createResponse Service error\n: ${err.message}`);
     return null;
   }
 };
