@@ -9,7 +9,6 @@ import secrets from "../../../secrets.json" assert { type: "json" };
 
 export const getAllUsers = async (req, res) => {
   const userList = await userProvider.retrieveAllUsers();
-
   return res.send(userList["name"]);
 };
 
@@ -23,7 +22,7 @@ export const oauthCallback = async (req, res) => {
   const code = req.query.code;
   try {
     const kakaoToken = await axios({
-      // 토큰 발급
+      // 인가 코드 발급
       method: "POST",
       url: "https://kauth.kakao.com/oauth/token",
       headers: {
@@ -47,7 +46,7 @@ export const oauthCallback = async (req, res) => {
       },
     });
 
-    const userId = encryptUtil.encrypt(kakaoUserInfo.data.id);
+    const userId = encryptUtil.encrypt(kakaoUserInfo.data.id); // 카카오계정 식별자 암호화
 
     const user = await userProvider.retrieveUser(userId);
     if (user) {
@@ -78,7 +77,7 @@ export const oauthCallback = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    logger.error(`App - Kakao Login error\n: ${err.message}`);
     return res.send(baseResponse.BAD_REQUEST);
   }
 };
@@ -88,7 +87,7 @@ export const userSignUp = async (req, res) => {
   const userName = req.body["name"];
 
   const newUser = await userService.createUser(userId, userName);
-  if (newUser === null) {
+  if (newUser) {
     const token = jwt.sign(
       {
         type: "JWT",
@@ -150,7 +149,6 @@ export const postResponse = async (req, res) => {
   if (!hostUser) {
     return res.send(baseResponse.USER_NOT_FOUND);
   }
-  const hostName = hostUser.name;
 
   const newResponse = await userService.createResponse(req.body);
   if (newResponse) {
@@ -163,7 +161,7 @@ export const postResponse = async (req, res) => {
       message: "Response Save Success",
       data: {
         hostId: String(hostId),
-        hostName: hostName,
+        hostName: hostUser.name,
         guestName: req.body["guestName"],
         animal: req.body["animal"],
         emoji: req.body["emoji"],

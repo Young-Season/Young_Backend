@@ -72,8 +72,6 @@ export const retrieveResult = async (hostId) => {
       },
     };
     return result;
-
-    return results;
   } else {
     return null;
   }

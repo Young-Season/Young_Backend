@@ -27,7 +27,8 @@
     "mongodb": "^6.3.0",
     "mongoose": "^8.0.3",
     "qs": "^6.11.2",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "type": "module",
   "devDependencies": {
