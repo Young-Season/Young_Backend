@@ -265,12 +265,12 @@ export const getGuestNamesAndCheckDup = async (req, res) => {
 export const getNames = async (req, res) => {
   const hostId = String(req.query.hostId);
 
-  const results = await userProvider.retrieveResult(hostId);
-  if (results)
+  const result = await userProvider.retrieveUser(hostId);
+  if (result)
     return res.send({
       status: "200",
       message: "Host name for Landing Page",
-      hostName: results.hostName,
+      hostName: result.name,
     });
   else return res.send(baseResponse.USER_NOT_FOUND);
 };
