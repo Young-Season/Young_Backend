@@ -152,9 +152,12 @@ export const postResponse = async (req, res) => {
   }
   const hostName = hostUser.name;
 
-  // and add user data to db of host
   const newResponse = await userService.createResponse(req.body);
-  if (newResponse)
+  if (newResponse) {
+    const descData = await userProvider.retrieveDescription(
+      `${req.body["first"]}${req.body["now"]}`
+    );
+
     return res.send({
       status: "201",
       message: "Response Save Success",
@@ -165,24 +168,25 @@ export const postResponse = async (req, res) => {
         animal: req.body["animal"],
         emoji: req.body["emoji"],
         color: req.body["color"],
-        first: req.body["first"],
-        now: req.body["now"],
+        title: descData.title,
+        first: descData.first,
+        now: descData.now,
       },
     });
-  else return res.send(baseResponse.BAD_REQUEST);
+  } else return res.send(baseResponse.BAD_REQUEST);
 };
 
-export const getResults = async (req, res) => {
-  const hostId = String(req.query.hostId);
+export const getResult = async (req, res) => {
+  const hostId = req.params.hostId;
 
-  const results = await userProvider.retrieveResults(hostId);
-  if (results)
+  const result = await userProvider.retrieveResult(hostId);
+  if (result)
     return res.send({
       status: "200",
-      message: "Result list for given host",
-      hostId: results.hostId,
-      hostName: results.hostName,
-      data: results.data,
+      message: "Result for given host",
+      hostId: result.hostId,
+      hostName: result.hostName,
+      data: result.data,
     });
   else return res.send(baseResponse.USER_NOT_FOUND);
 };
