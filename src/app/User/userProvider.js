@@ -44,23 +44,34 @@ export const retrieveHostResult = async (hostId) => {
   }
 };
 
-export const retrieveResults = async (hostId) => {
+export const retrieveResult = async (hostId) => {
   const userData = await userDao.selectUser(hostId);
 
   if (userData) {
-    const results = {
+    let firsts = {};
+    arrName.forEach((name, idx) => {
+      const arr = userData[name];
+      const first = Math.max(...arr);
+      firsts[name] = arr.indexOf(first);
+    });
+
+    const descData = await userDao.selectDescription(
+      `${firsts["first"]}${firsts["now"]}`
+    );
+
+    const result = {
       hostId: String(userData.id),
       hostName: userData.name,
-      data: userData.friends.map((friend) => ({
-        guestName: friend.name,
-        animal: friend.animal,
-        emoji: friend.emoji,
-        color: friend.color,
-        first: friend.first,
-        now: friend.now,
-      })),
+      data: {
+        animal: firsts["animal"],
+        emoji: firsts["emoji"],
+        color: firsts["color"],
+        title: descData.title,
+        first: descData.first,
+        now: descData.now,
+      },
     };
-    return results;
+    return result;
   } else {
     return null;
   }
@@ -107,4 +118,9 @@ export const retrieveStats = async (hostId) => {
 
     return result;
   }
+};
+
+export const retrieveDescription = async (resultId) => {
+  const descData = await userDao.selectDescription(resultId);
+  return descData;
 };

@@ -9,7 +9,6 @@ import secrets from "../../../secrets.json" assert { type: "json" };
 
 export const getAllUsers = async (req, res) => {
   const userList = await userProvider.retrieveAllUsers();
-
   return res.send(userList["name"]);
 };
 
@@ -23,7 +22,7 @@ export const oauthCallback = async (req, res) => {
   const code = req.query.code;
   try {
     const kakaoToken = await axios({
-      // 토큰 발급
+      // 인가 코드 발급
       method: "POST",
       url: "https://kauth.kakao.com/oauth/token",
       headers: {
@@ -47,7 +46,7 @@ export const oauthCallback = async (req, res) => {
       },
     });
 
-    const userId = encryptUtil.encrypt(kakaoUserInfo.data.id);
+    const userId = encryptUtil.encrypt(kakaoUserInfo.data.id); // 카카오계정 식별자 암호화
 
     const user = await userProvider.retrieveUser(userId);
     if (user) {
@@ -78,7 +77,7 @@ export const oauthCallback = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    logger.error(`App - Kakao Login error\n: ${err.message}`);
     return res.send(baseResponse.BAD_REQUEST);
   }
 };
@@ -88,7 +87,7 @@ export const userSignUp = async (req, res) => {
   const userName = req.body["name"];
 
   const newUser = await userService.createUser(userId, userName);
-  if (newUser === null) {
+  if (newUser) {
     const token = jwt.sign(
       {
         type: "JWT",
@@ -150,39 +149,42 @@ export const postResponse = async (req, res) => {
   if (!hostUser) {
     return res.send(baseResponse.USER_NOT_FOUND);
   }
-  const hostName = hostUser.name;
 
-  // and add user data to db of host
   const newResponse = await userService.createResponse(req.body);
-  if (newResponse)
+  if (newResponse) {
+    const descData = await userProvider.retrieveDescription(
+      `${req.body["first"]}${req.body["now"]}`
+    );
+
     return res.send({
       status: "201",
       message: "Response Save Success",
       data: {
         hostId: String(hostId),
-        hostName: hostName,
+        hostName: hostUser.name,
         guestName: req.body["guestName"],
         animal: req.body["animal"],
         emoji: req.body["emoji"],
         color: req.body["color"],
-        first: req.body["first"],
-        now: req.body["now"],
+        title: descData.title,
+        first: descData.first,
+        now: descData.now,
       },
     });
-  else return res.send(baseResponse.BAD_REQUEST);
+  } else return res.send(baseResponse.BAD_REQUEST);
 };
 
-export const getResults = async (req, res) => {
-  const hostId = String(req.query.hostId);
+export const getResult = async (req, res) => {
+  const hostId = req.params.hostId;
 
-  const results = await userProvider.retrieveResults(hostId);
-  if (results)
+  const result = await userProvider.retrieveResult(hostId);
+  if (result)
     return res.send({
       status: "200",
-      message: "Result list for given host",
-      hostId: results.hostId,
-      hostName: results.hostName,
-      data: results.data,
+      message: "Result for given host",
+      hostId: result.hostId,
+      hostName: result.hostName,
+      data: result.data,
     });
   else return res.send(baseResponse.USER_NOT_FOUND);
 };
@@ -263,7 +265,7 @@ export const getGuestNamesAndCheckDup = async (req, res) => {
 export const getNames = async (req, res) => {
   const hostId = String(req.query.hostId);
 
-  const results = await userProvider.retrieveResults(hostId);
+  const results = await userProvider.retrieveResult(hostId);
   if (results)
     return res.send({
       status: "200",

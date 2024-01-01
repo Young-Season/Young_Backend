@@ -1,5 +1,6 @@
 import { createLogger, format, transports } from "winston";
 import fs from "fs";
+import "winston-daily-rotate-file";
 
 const env = process.env.NODE_ENV || "development";
 const logDir = "log";
@@ -7,6 +8,15 @@ const logDir = "log";
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
+
+const dailyRotateFileTransport = new transports.DailyRotateFile({
+  level: "debug",
+  filename: `${logDir}/%DATE%-smart-push.log`,
+  datePattern: "YYYY-MM-DD",
+  zippedArchive: true,
+  maxSize: "20m",
+  maxFiles: "14d",
+});
 
 export const logger = createLogger({
   level: env === "development" ? "debug" : "info",
@@ -26,11 +36,6 @@ export const logger = createLogger({
         )
       ),
     }),
+    dailyRotateFileTransport,
   ],
 });
-
-export const stream = {
-  write: (message) => {
-    logger.info(message.trim());
-  },
-};

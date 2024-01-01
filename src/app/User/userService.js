@@ -1,17 +1,26 @@
 import * as userDao from "./userDao.js";
 
 export const createUser = async (userId, userName) => {
-  const existingUser = await userDao.selectUser(userId);
-
-  if (existingUser) {
-    return existingUser;
-  } else {
-    const newUser = await userDao.createNewUser(userId, userName);
+  try {
+    const existingUser = await userDao.selectUser(userId);
+    if (existingUser) {
+      return null;
+    } else {
+      const newUser = await userDao.createNewUser(userId, userName);
+      return newUser;
+    }
+  } catch (err) {
+    logger.error(`App - createUser Service error\n: ${err.message}`);
     return null;
   }
 };
 
 export const createResponse = async (requestData) => {
-  const newResponse = await userDao.createNewResponse(requestData);
-  return newResponse;
+  try {
+    const newResponse = await userDao.createNewResponse(requestData);
+    return newResponse;
+  } catch (err) {
+    logger.error(`App - createUser Service error\n: ${err.message}`);
+    return null;
+  }
 };
