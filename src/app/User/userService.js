@@ -1,4 +1,5 @@
 import * as userDao from "./userDao.js";
+import { logger } from "../../../config/winston.js";
 
 export const createUser = async (userId, userName) => {
   try {
