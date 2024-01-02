@@ -63,9 +63,7 @@ export const retrieveResult = async (hostId) => {
       hostId: String(userData.id),
       hostName: userData.name,
       data: {
-        animal: firsts["animal"],
-        emoji: firsts["emoji"],
-        color: firsts["color"],
+        image: `${firsts["color"]}${firsts["emoji"]}${firsts["animal"]}`,
         title: descData.title,
         first: descData.first,
         now: descData.now,
