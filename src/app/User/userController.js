@@ -6,6 +6,7 @@ import * as userProvider from "./userProvider.js";
 import * as userService from "./userService.js";
 import * as encryptUtil from "../../utils/encryption.js";
 import secrets from "../../../secrets.json" assert { type: "json" };
+import { logger } from "../../../config/winston.js";
 
 export const getAllUsers = async (req, res) => {
   const userList = await userProvider.retrieveAllUsers();

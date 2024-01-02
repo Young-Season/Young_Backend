@@ -1,5 +1,4 @@
 import * as userDao from "./userDao.js";
-import { logger } from "../../../config/winston.js";
 
 const arrName = ["animal", "emoji", "color", "first", "now"];
 
