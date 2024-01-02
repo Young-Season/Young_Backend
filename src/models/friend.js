@@ -7,7 +7,6 @@ const friendSchema = new Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
     },
     animal: Number,
     emoji: Number,
