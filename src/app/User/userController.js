@@ -240,8 +240,8 @@ export const getStats = async (req, res) => {
 
 export const getGuestNamesAndCheckDup = async (req, res) => {
   const hostId = req.query.hostId;
-  const guestNameProvided = req.query.name;
-  const guestName = guestNameProvided.replace("+", " ");
+  const guestName = req.query.name;
+  
   const user = await userProvider.retrieveUser(hostId);
   if (!user) {
     return res.send(baseResponse.USER_NOT_FOUND);
