@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from "winston";
 import fs from "fs";
-import "winston-daily-rotate-file";
+import winstonDaily from "winston-daily-rotate-file";
 
 const env = process.env.NODE_ENV || "development";
 const logDir = "log";
@@ -27,15 +27,21 @@ export const logger = createLogger({
     format.json()
   ),
   transports: [
-    new transports.Console({
+    new winstonDaily({
       level: "info",
-      format: format.combine(
-        format.colorize(),
-        format.printf(
-          (info) => `${info.timestamp} ${info.level}: ${info.message}`
-        )
-      ),
+      datePattern: "YYYY-MM-DD",
+      dirname: logDir,
+      filename: `%DATE%.log`,
+      maxFiles: 30, // 30일치 로그 파일 저장
+      zippedArchive: true,
     }),
-    dailyRotateFileTransport,
+    new winstonDaily({
+      level: "error",
+      datePattern: "YYYY-MM-DD",
+      dirname: logDir + "/error", // error.log 파일은 /logs/error 하위에 저장
+      filename: `%DATE%.error.log`,
+      maxFiles: 30,
+      zippedArchive: true,
+    }),
   ],
 });
